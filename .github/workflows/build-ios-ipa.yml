@@ -1,0 +1,19 @@
+name: Build iOS IPA (Unsigned)
+on:
+  workflow_dispatch: # 支持手动触发
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: cd ios && pod install --repo-update && cd ..
+      - run: flutter build ipa --release --no-codesign
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DaidaiPanel-unsigned-ipa
+          path: build/ios/ipa/*.ipa
