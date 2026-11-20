@@ -1,19 +1,60 @@
 name: Build iOS IPA (Unsigned)
 on:
-  workflow_dispatch: # 支持手动触发
+  workflow_dispatch:
+
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-      - run: flutter pub get
-      - run: cd ios && pod install --repo-update && cd ..
-      - run: flutter build ipa --release --no-codesign
-      - uses: actions/upload-artifact@v4
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate iOS project if missing
+        run: |
+          if [ ! -d "ios" ]; then
+            flutter create --platforms=ios .
+          fi
+
+      - name: Fix Podfile platform version
+        run: |
+          cd ios
+          if [ ! -f "Podfile" ]; then
+            pod init
+          fi
+          # 删除已有的 platform 行，避免重复
+          sed -i '' '/^platform :ios/d' Podfile
+          # 在第一行插入正确的 platform 声明
+          sed -i '' "1i\\
+          platform :ios, '14.0'
+          " Podfile
+          echo "=== Podfile content ==="
+          head -5 Podfile
+          cd ..
+
+      - name: Pod install
+        run: |
+          cd ios
+          pod repo update
+          pod install
+          cd ..
+
+      - name: Build IPA
+        run: flutter build ipa --release --no-codesign
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: DaidaiPanel-unsigned-ipa
           path: build/ios/ipa/*.ipa
+          if-no-files-found: error
