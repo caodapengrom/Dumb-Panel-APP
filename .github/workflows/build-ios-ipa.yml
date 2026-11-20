@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -32,9 +32,7 @@ jobs:
           if [ ! -f "Podfile" ]; then
             pod init
           fi
-          # 删除已有的 platform 行，避免重复
           sed -i '' '/^platform :ios/d' Podfile
-          # 在第一行插入正确的 platform 声明
           sed -i '' "1i\\
           platform :ios, '14.0'
           " Podfile
