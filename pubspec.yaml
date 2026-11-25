@@ -1,7 +1,7 @@
 name: daidai_app
 description: "呆呆面板 Flutter 客户端 - 轻量级定时任务管理"
 publish_to: 'none'
-version: 1.4.6+36
+version: 2.0.0+37
 
 environment:
   sdk: ^3.11.3
@@ -45,6 +45,11 @@ dependencies:
 
   # 脚本 / 配置文件编辑器：按行虚拟化渲染，几千行的长脚本打字、滚动不再整篇重排（APP #25）
   re_editor: ^0.10.0
+
+  # 系统集成（APP v2.0）：长按图标快捷方式（安卓 + iOS）、安卓桌面小组件、安卓「任务运行中」常驻通知
+  quick_actions: ^1.1.1
+  home_widget: ^0.10.0
+  flutter_local_notifications: ^22.3.3
 
 dev_dependencies:
   flutter_test:
